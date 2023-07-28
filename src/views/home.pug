@@ -10,10 +10,14 @@ html(lang="en")
       h1 Chat Room
     main
       #message-container
-        ul#messages
+      form#nickname-form
+        input(type='text', id='nickname', placeholder='what your name?')
+        button(type='submit') save
+
       form#chat-form
-        input(type='text', id='message', placeholder='Type your message...')
+        input(type='text', id='message_form', placeholder='Type your message...')
         button(type='submit') Send
+      ul#messages
     script(src="/public/js/app.js")
 
     //-  <link rel="stylesheet" href="https://unpkg.com/mvp.css"> 

@@ -19,14 +19,18 @@ const ws_server = new WebSocket.Server({server});
 
 const sockets = new Map(); //dic 에서 key값이 중복안되는 객체
 
+function str2json(object){
+    let str = JSON.parse(object);
+    return str;
+}
 //서버와 연결
 ws_server.on("connection", (socket) => {
   const socketId = Date.now();
-
+  socket["nickname"] = "Anon";
   sockets.set(socketId, socket); // key,value 연결
 
   console.log(`Connected from browser:${socketId}`);
-  socket.send(`welcome ${socketId}!`);
+//   socket.send(`welcome ${socketId}!`);
 
   socket.on("close", () => {
     sockets.delete(socketId);
@@ -36,11 +40,22 @@ ws_server.on("connection", (socket) => {
   socket.on("message", (message) => {
     const buffer = Buffer.from(message);
     const str = buffer.toString("utf8");
+    const message_type = str2json(str);
+    // console.log(message_type);
     sockets.forEach((aSocket) => {
-        if (aSocket !== socket){
-            aSocket.send(`${socketId}:${str}`);
-        } 
-    });
+        // if(aSocket !== socket){
+            if(message_type.type === "nickname"){
+                socket["nickname"] = message_type.payload;
+            }
+            // console.log(message_type.payload);
+            else if(message_type.type === "message"){
+            aSocket.send(JSON.stringify({ 
+                nickname:socket.nickname,
+                message:message_type.payload
+            }));
+        }
+        // }
+    });   
   });
 });
 
